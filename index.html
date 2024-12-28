@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tron Mining</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+      background-color: #f0f0f0;
+    }
+    input, button, select {
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    .status {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Mine Tron (TRX) on Your Browser</h1>
+  <p>Enter your Tron wallet address below to start mining!</p>
+  
+  <input type="text" id="tronAddress" placeholder="Enter your Tron address" />
+  <br>
+
+  <label for="miningMode">Choose Mining Mode:</label>
+  <select id="miningMode">
+    <option value="cpu">CPU</option>
+    <option value="gpu">GPU</option>
+  </select>
+  <br>
+
+  <button id="startMining">Start Mining</button>
+  <button id="stopMining" disabled>Stop Mining</button>
+
+  <div class="status">
+    <p>Status: <span id="statusText">Idle</span></p>
+    <p>TRX Mined: <span id="trxMined">0</span></p>
+  </div>
+
+  <!-- Mining Script -->
+  <script src="https://unminable.com/mining-library.js"></script>
+  <script>
+    let mining = false;
+    let trxMined = 0;
+    let miner = null;
+
+    document.getElementById('startMining').addEventListener('click', () => {
+      const address = document.getElementById('tronAddress').value;
+      const mode = document.getElementById('miningMode').value;
+
+      if (!address) {
+        alert("Please enter your Tron address!");
+        return;
+      }
+
+      // Generate random miner name
+      const randomName = "miner_" + Math.random().toString(36).substring(2, 10);
+
+      // Start Mining
+      mining = true;
+      document.getElementById('statusText').innerText = "Mining...";
+      document.getElementById('startMining').disabled = true;
+      document.getElementById('stopMining').disabled = false;
+
+      // Initialize miner
+      miner = UnminableMiner.start({
+        pool: "unminable",
+        coin: "TRX",
+        address: address,
+        worker: randomName,
+        threads: mode === "cpu" ? navigator.hardwareConcurrency : 1,
+      });
+
+      // Simulate mining progress (replace with actual stats if available)
+      const miningProgress = setInterval(() => {
+        if (!mining) {
+          clearInterval(miningProgress);
+          return;
+        }
+        trxMined += Math.random() * 0.01; // Fake progress for demo
+        document.getElementById('trxMined').innerText = trxMined.toFixed(4);
+      }, 1000);
+    });
+
+    document.getElementById('stopMining').addEventListener('click', () => {
+      mining = false;
+      document.getElementById('statusText').innerText = "Stopped";
+      document.getElementById('startMining').disabled = false;
+      document.getElementById('stopMining').disabled = true;
+
+      // Stop miner
+      if (miner) miner.stop();
+    });
+  </script>
+</body>
+</html>
